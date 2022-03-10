@@ -1,0 +1,618 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emailservice
+spec:
+  replicas: 2
+  selector:
+    matchlabels:
+      apps: emailservice
+    template:
+      metadata:
+        labels:
+          apps: emailservice
+      spec:
+        containers:
+        - name: service
+          image: gcr.io/google-samples/microservices-demo/emailservice/v0.2.3
+          ports:
+          - containerPort: 8080
+          env:
+          - name: PORT
+           value: ''8080''
+          - name: DISABLE_TRACING
+            value: "1"
+          - name: DISABLE_PROFILER
+            value: "1"
+          livenessProbe:
+            periodSeconds: 5
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:8080"]
+          readinessProbe:
+            periodSeconds: 5
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:8080"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: emailservice
+spec:
+  type: ClusterIP
+  selector:
+    app:
+  ports:
+  - protocol: TCP
+    ports: 5000
+    targetPort: 8080
+
+---
+apiVersion: apps/v1
+kind: Deploymnet
+metadata:
+  name: recommendationservice
+spec:
+  replicas: 2
+  selector:
+    matchlabels:
+      apps: recommendationservice
+    template:
+      metadata:
+        labels:
+          apps: recommendationservice
+      spec:
+        containers:
+        - name: service
+          image: gcr.io/google-samples/microservices-demo/recommendationservice/v0.2.3
+          ports: 8080
+          - containerPort: 8080
+          env:
+          - name: PORT
+            value: ''8080''
+           - name: DISABLE_TRACING
+            value: "1"
+          - name: DISABLE_PROFILER
+            value: "1"
+          - name: PRODUCT_CATALOG_SERVICE_ADDR
+            value: 'productcatalogueservice:3550'
+          livenessProbe:
+            periodSeconds: 5
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:8080"]
+          readinessProbe:
+            periodSeconds: 5
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:8080"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name:recommendationservice
+spec:
+  type: ClusterIP
+  selector:
+    app:
+  ports:
+  - protocol: TCP
+    ports:
+    targetPort: 8080
+
+---
+apiVersion: apps/v1
+kind: Deploymnet
+metadata:
+  name: productcatalogueservice
+spec:
+  replicas: 2
+  selector:
+    matchlabels:
+      apps: productcatalogueservice
+    template:
+      metadata:
+        labels:
+          apps: productcatalogueservice
+      spec:
+        containers:
+        - name: service
+          image: gcr.io/google-samples/microservices-demo/productcatalogueservice/v0.2.3
+          ports: 
+          - containerPort: 3550
+          env:
+          - name: PORT
+            value: ''3550''
+          livenessProbe:
+            periodSeconds: 5
+            httpGet:
+             path: /health
+             port: 3550
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:3550"]
+          readinessProbe:
+            periodSeconds: 5
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:3550"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: productcatalogueservice
+spec:
+  type: ClusterIP
+  selector:
+    app:
+  ports:
+  - protocol: TCP
+    ports: 3550
+    targetPort: 3550
+
+---
+apiVersion: apps/v1
+kind: Deploymnet
+metadata:
+  name: paymentservice
+spec:
+  replicas: 2
+  selector:
+    matchlabels:
+      apps: paymentservice
+    template:
+      metadata:
+        labels:
+          apps: paymentservice
+      spec:
+        containers:
+        - name: service
+          image: gcr.io/google-samples/microservices-demo/paymentservice/v0.2.3
+          ports: 
+          - containerPort: 50051
+          env:
+          - name: PORT
+            value: '50051'
+          livenessProbe:
+            periodSeconds: 5
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:50051"]
+          readinessProbe:
+            periodSeconds: 5
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:50051"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: paymentservice
+spec:
+  type: ClusterIP
+  selector:
+    app: paymentservice
+  ports:
+  - protocol: TCP
+    ports: 50051
+    targetPort: 50051
+
+---
+apiVersion: apps/v1
+kind: Deploymnet
+metadata:
+  name: currencyservice
+spec:
+  replicas: 2
+  selector:
+    matchlabels:
+      apps: currencyservice
+    template:
+      metadata:
+        labels:
+          apps: currencyservice
+      spec:
+        containers:
+        - name: service
+          image: gcr.io/google-samples/microservices-demo/currencyservice/v0.2.3
+          ports:
+          - containerPort: '7000'
+          env:
+          - name:
+            value: '7000'
+          livenessProbe:
+            periodSeconds: 5
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:7000"]
+          readinessProbe:
+            periodSeconds: 5
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:7000"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: currencyservice
+spec:
+  type: ClusterIP
+  selector:
+    app: currencyservice
+  ports:
+  - protocol: TCP
+    ports: '7000'
+    targetPort: '7000'
+
+---
+apiVersion: apps/v1
+kind: Deploymnet
+metadata:
+  name: shippingservice
+spec:
+  replicas: 2
+  selector:
+    matchlabels:
+      apps: shippingservice
+    template:
+      metadata:
+        labels:
+          apps: shippingservice
+      spec:
+        containers:
+        - name: service
+          image: gcr.io/google-samples/microservices-demo/shippingservice/v0.2.3
+          ports:
+          - containerPort: '50051'
+          env:
+          - name: PORT
+            value: '50051'
+          livenessProbe:
+            periodSeconds: 5
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:50051"]
+          readinessProbe:
+            periodSeconds: 5
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:50051"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shippingservice
+spec:
+  type: ClusterIP
+  selector:
+    app: shippingservice
+  ports:
+  - protocol: TCP
+    ports: '50051'
+    targetPort:'50051'
+
+---
+apiVersion: apps/v1
+kind: Deploymnet
+metadata:
+  name: Adservice
+spec:
+  replicas: 2
+  selector:
+    matchlabels:
+      apps: Adservice
+    template:
+      metadata:
+        labels:
+          apps: Adservice
+      spec:
+        containers:
+        - name: service
+          image: gcr.io/google-samples/microservices-demo/Adservice/v0.2.3
+          ports:
+          - containerPort: '9555'
+          env:
+          - name: 'PORT'
+            value: '9555'
+          livenessProbe:
+            periodSeconds: 5
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:9555"]
+          readinessProbe:
+            periodSeconds: 5
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:9555"]
+          resources:
+            requests:
+              cpu: 200m
+              memory: 180Mi
+            limits:
+              cpu: 300m
+              memory: 300Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: Adservice
+spec:
+  type: ClusterIP
+  selector:
+    app: Adservice
+  ports:
+  - protocol: TCP
+    ports: '9555'
+    targetPort: '9555'
+
+---
+apiVersion: apps/v1
+kind: Deploymnet
+metadata:
+  name: cartservice
+spec:
+  replicas: 2
+  selector:
+    matchlabels:
+      apps: cartservice
+    template:
+      metadata:
+        labels:
+          apps: cartservice
+      spec:
+        containers:
+        - name:
+          image: gcr.io/google-samples/microservices-demo/cartservice/v0.2.3
+          ports:
+          - containerPort: '7070'
+          env: 
+          - name: PORT
+            value: '7070'
+          - name: REDIS_ADDR
+            value: 'redis-cart:6379'
+          livenessProbe:
+            periodSeconds: 5
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:7070"]
+          readinessProbe:
+            periodSeconds: 5
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:7070"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cartservice
+spec:
+  type: ClusterIP
+  selector:
+    app: cartservice
+  ports:
+  - protocol: TCP
+    ports: '7070'
+    targetPort: '7070'
+
+---
+apiVersion: apps/v1
+kind: Deploymnet
+metadata:
+  name: redis-cart
+spec:
+  replicas: 2
+  selector:
+    matchlabels:
+      apps: redis-cart
+    template:
+      metadata:
+        labels:
+          apps: redis-cart
+      spec:
+        containers:
+        - name: redis
+          image: redis:alpine
+          ports:
+          - containerPort: 6379
+        livenessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            tcpSocket: 
+              port: 6379
+        readinessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            tcpSocket:
+              port: 6379
+        resources:
+            requests:
+              cpu: 70m
+              memory: 200Mi
+            limits:
+              cpu: 120m
+              memory: 300Mi
+          volumeMount:
+          - name: redis-data
+            mountPath: /data
+        volumes:
+        - name: redis-data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-cart
+spec:
+  type: ClusterIP
+  selector:
+    app: redis-cart
+  ports:
+  - protocol: TCP
+    ports: 6379
+    targetPort: 6379
+
+---
+apiVersion: apps/v1
+kind: Deploymnet
+metadata: 
+  name: checkoutservice
+spec:
+  replicas: 2
+  selector:
+    matchlabels:
+      apps: checkoutservice
+    template:
+      metadata:
+        labels:
+          apps: checkoutservice
+      spec:
+        containers:
+        - name:
+          image: gcr.io/google-samples/microservices-demo/checkoutservice/v0.2.3
+          ports:
+          - containerPort: 5050
+          env:
+          - name: PORT
+            value: "5050"
+          - name: PRODUCT_CATALOGUE_SERVICE_ADDR
+            value: "productcatalogueservice:3550"
+          - name: SHIPPING_SERVICE_ADDR
+            value: "shippingservice:50051"
+          - name: PAYMENT_SERVICE_ADDR
+            value: "paymentservice:50051"
+          - name: EMAIL_SERVICE_ADDR
+            value: ''emailservice:5000''
+          - name: CURRENCY_SERVICE_ADDR
+            value: ''currencyservice:7000''
+          - name: CART_SERVICE_ADDR
+            value: "cartservice:7070"
+          livenessProbe:
+            periodSeconds: 5
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:5050"]
+          readinessProbe:
+            periodSeconds: 5
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:5050"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: checkoutservice
+spec:
+  type: ClusterIP
+  selector:
+    app: checkoutservice
+  ports:
+  - protocol: TCP
+    ports: 5050
+    targetPort: 5050
+
+---
+apiVersion: apps/v1
+kind: Deploymnet
+metadata:
+  name: frontend
+spec:
+  replicas: 2
+  selector:
+    matchlabels:
+      apps: frontend
+    template:
+      metadata:
+        labels:
+          apps: frontend
+      spec:
+        containers:
+        - name:
+          image: gcr.io/google-samples/microservices-demo/frontend/v0.2.3
+          ports:
+          - containerPort: 8080
+          env:
+          - name: PORT
+            value: "8080"
+          - name: PRODUCT_CATALOGUE_SERVICE_ADDR
+            value: "productcatalogueservice:3550"
+          - name: SHIPPING_SERVICE_ADDR
+            value: "shippingservice:50051"
+          - name: CURRENCY_SERVICE_ADDR
+            value: ''currencyservice:7000''
+          - name: CART_SERVICE_ADDR
+            value: "cartservice:7070"
+          - name: RECOMMNENDATION_SERVICE_ADDR
+            value: "recommendation:8080"
+          - name: CHECKOUT_SERVICE_ADDR
+            value: "checkoutservice:5050"
+          - name: AD_SERVICE_ADDR
+            value: 'adservice:9555'
+          livenessProbe:
+            periodSeconds: 5
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:8080"]
+          readinessProbe:
+            periodSeconds: 5
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:8080"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  type: loadBalancer
+  selector:
+    app: frontend
+  ports:
+  - protocol: TCP
+    ports: 80
+    targetPort: 8080
+---
