@@ -449,23 +449,6 @@ spec:
           image: redis:alpine
           ports:
           - containerPort: 6379
-        livenessProbe:
-            initialDelaySeconds: 5
-            periodSeconds: 5
-            tcpSocket: 
-              port: 6379
-        readinessProbe:
-            initialDelaySeconds: 5
-            periodSeconds: 5
-            tcpSocket:
-              port: 6379
-        resources:
-            requests:
-              cpu: 70m
-              memory: 200Mi
-            limits:
-              cpu: 120m
-              memory: 300Mi
           volumeMount:
           - name: redis-data
             mountPath: /data

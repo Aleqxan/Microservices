@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deploymnet
+metadata:
+  name: {{ .Values.appName }}
+spec:
+  replicas: {{ .Values.appReplicas }}
+  selector:
+    matchlabels:
+      apps: {{ .Values.appName }}
+    template:
+      metadata:
+        labels:
+          apps: {{ .Values.appName }}
+      spec:
+        containers:
+        - name: {{ .Values.appName }}
+          image:"{{ .Values.appImage }}:{{ .Values.appVersion }}"
+          ports:
+          - containerPort: {{ .Values.containerPort }}
+          volumeMount:
+          - name: {{ .Values.volumeName }}
+            mountPath: {{ .Values.containerMountPath }}
+        volumes:
+        - name: {{ .Values.volumeName }}
+          emptyDir: {}

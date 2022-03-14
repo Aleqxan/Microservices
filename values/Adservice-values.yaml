@@ -1,0 +1,12 @@
+appNmae: Adservice
+appImage: gcr.io/google-samples/microservices-demo/Adservice
+appVersion: v.0.2.3
+appReplicas: 2
+containerPort: 9555
+containerEnvVars:
+env:
+- name: 'PORT'
+    value: '9555'
+
+servicePort: 9555
+serviceType: clusetrIP
